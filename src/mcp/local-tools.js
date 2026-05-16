@@ -57,6 +57,15 @@ async function ensureBrowser() {
     }
     browser = await createBrowser();
     page = await createPage(browser);
+    // Auto-login with session cookie if available (avoids needing explicit x_login calls)
+    const cookie = process.env.XACTIONS_SESSION_COOKIE;
+    if (cookie && cookie !== 'paste_your_x_auth_token_here') {
+      try {
+        await loginWithCookie(page, cookie);
+      } catch (e) {
+        console.error('[xactions] auto-login failed:', e.message);
+      }
+    }
   }
   return { browser, page };
 }
